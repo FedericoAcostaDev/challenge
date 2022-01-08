@@ -1,9 +1,10 @@
 import React from "react";
+import Form from "../../components/Form/Form";
 import "./Home.css";
 const Home = () => {
   return (
-    <div className="home">
-      <h1>Home</h1>
+    <div>
+      <Form />
     </div>
   );
 };
