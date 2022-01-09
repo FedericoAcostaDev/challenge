@@ -23,7 +23,6 @@ const Form = () => {
   const [pwdFocus, setPwdFocus] = useState(false);
 
   const [errMsg, setErrMsg] = useState("");
-  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
@@ -41,7 +40,7 @@ const Form = () => {
     setValidPwd(SSN_REGEX.test(pwd));
   }, [pwd]);
 
-  /* const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // if button enabled with JS hack
     const v1 = INFO_REGEX.test(user);
@@ -50,6 +49,10 @@ const Form = () => {
       setErrMsg("Invalid Entry");
       return;
     }
+    //adeed to check server connection
+    console.log(user, pwd);
+
+    //added
     try {
       const response = await axios.post(
         REGISTER_URL,
@@ -62,7 +65,6 @@ const Form = () => {
       console.log(response?.data);
       console.log(response?.accessToken);
       console.log(JSON.stringify(response));
-      setSuccess(true);
       //clear state and controlled inputs
       //need value attrib on inputs for this
       setUser("");
@@ -78,180 +80,171 @@ const Form = () => {
       }
       errRef.current.focus();
     }
-  }; */
+  };
 
   return (
     <>
-      {success ? (
-        <section>
-          <h1>Success!</h1>
-          <p>
-            <a href="#">Sign In</a>
-          </p>
-        </section>
-      ) : (
-        <section>
+      <section>
+        <p
+          ref={errRef}
+          className={errMsg ? "errmsg" : "offscreen"}
+          aria-live="assertive"
+        >
+          {errMsg}
+        </p>
+        <h1>Add Member</h1>
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="firstname">
+            Firstname:
+            <FontAwesomeIcon
+              icon={faCheck}
+              className={firstName ? "valid" : "hide"}
+            />
+            <FontAwesomeIcon
+              icon={faTimes}
+              className={firstName || !user ? "hide" : "invalid"}
+            />
+          </label>
+          <input
+            type="text"
+            id="firstname"
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setUser(e.target.value)}
+            value={user}
+            required
+            aria-invalid={firstName ? "false" : "true"}
+            aria-describedby="uidnote"
+            onFocus={() => setUserFocus(true)}
+            onBlur={() => setUserFocus(false)}
+          />
           <p
-            ref={errRef}
-            className={errMsg ? "errmsg" : "offscreen"}
-            aria-live="assertive"
+            id="uidnote"
+            className={
+              userFocus && user && !firstName ? "instructions" : "offscreen"
+            }
           >
-            {errMsg}
+            <FontAwesomeIcon icon={faInfoCircle} />
+            1 to 24 characters.
+            <br />
+            Letters, numbers, underscores, hyphens allowed.
           </p>
-          <h1>Add Member</h1>
-          <form>
-            <label htmlFor="firstname">
-              Firstname:
-              <FontAwesomeIcon
-                icon={faCheck}
-                className={firstName ? "valid" : "hide"}
-              />
-              <FontAwesomeIcon
-                icon={faTimes}
-                className={firstName || !user ? "hide" : "invalid"}
-              />
-            </label>
-            <input
-              type="text"
-              id="firstname"
-              ref={userRef}
-              autoComplete="off"
-              onChange={(e) => setUser(e.target.value)}
-              value={user}
-              required
-              aria-invalid={firstName ? "false" : "true"}
-              aria-describedby="uidnote"
-              onFocus={() => setUserFocus(true)}
-              onBlur={() => setUserFocus(false)}
-            />
-            <p
-              id="uidnote"
-              className={
-                userFocus && user && !firstName ? "instructions" : "offscreen"
-              }
-            >
-              <FontAwesomeIcon icon={faInfoCircle} />
-              1 to 24 characters.
-              <br />
-              Letters, numbers, underscores, hyphens allowed.
-            </p>
 
-            <label htmlFor="lastname">
-              Lastname:
-              <FontAwesomeIcon
-                icon={faCheck}
-                className={lastName ? "valid" : "hide"}
-              />
-              <FontAwesomeIcon
-                icon={faTimes}
-                className={lastName || !user ? "hide" : "invalid"}
-              />
-            </label>
-            <input
-              type="text"
-              id="lastname"
-              ref={userRef}
-              autoComplete="off"
-              onChange={(e) => setUser(e.target.value)}
-              value={user}
-              required
-              aria-invalid={lastName ? "false" : "true"}
-              aria-describedby="uidnote"
-              onFocus={() => setUserFocus(true)}
-              onBlur={() => setUserFocus(false)}
+          <label htmlFor="lastname">
+            Lastname:
+            <FontAwesomeIcon
+              icon={faCheck}
+              className={lastName ? "valid" : "hide"}
             />
-            <p
-              id="uidnote"
-              className={
-                userFocus && user && !lastName ? "instructions" : "offscreen"
-              }
-            >
-              <FontAwesomeIcon icon={faInfoCircle} />
-              1 to 24 characters.
-              <br />
-              Letters, numbers, underscores, hyphens allowed.
-            </p>
+            <FontAwesomeIcon
+              icon={faTimes}
+              className={lastName || !user ? "hide" : "invalid"}
+            />
+          </label>
+          <input
+            type="text"
+            id="lastname"
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setUser(e.target.value)}
+            value={user}
+            required
+            aria-invalid={lastName ? "false" : "true"}
+            aria-describedby="uidnote"
+            onFocus={() => setUserFocus(true)}
+            onBlur={() => setUserFocus(false)}
+          />
+          <p
+            id="uidnote"
+            className={
+              userFocus && user && !lastName ? "instructions" : "offscreen"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            1 to 24 characters.
+            <br />
+            Letters, numbers, underscores, hyphens allowed.
+          </p>
 
-            <label htmlFor="adress">
-              Adress:
-              <FontAwesomeIcon
-                icon={faCheck}
-                className={lastName ? "valid" : "hide"}
-              />
-              <FontAwesomeIcon
-                icon={faTimes}
-                className={lastName || !user ? "hide" : "invalid"}
-              />
-            </label>
-            <input
-              type="text"
-              id="lastname"
-              ref={userRef}
-              autoComplete="off"
-              onChange={(e) => setUser(e.target.value)}
-              value={user}
-              required
-              aria-invalid={lastName ? "false" : "true"}
-              aria-describedby="uidnote"
-              onFocus={() => setUserFocus(true)}
-              onBlur={() => setUserFocus(false)}
+          <label htmlFor="adress">
+            Adress:
+            <FontAwesomeIcon
+              icon={faCheck}
+              className={lastName ? "valid" : "hide"}
             />
-            <p
-              id="uidnote"
-              className={
-                userFocus && user && !lastName ? "instructions" : "offscreen"
-              }
-            >
-              <FontAwesomeIcon icon={faInfoCircle} />
-              1 to 24 characters.
-              <br />
-              Letters, numbers, underscores, hyphens allowed.
-            </p>
+            <FontAwesomeIcon
+              icon={faTimes}
+              className={lastName || !user ? "hide" : "invalid"}
+            />
+          </label>
+          <input
+            type="text"
+            id="lastname"
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setUser(e.target.value)}
+            value={user}
+            required
+            aria-invalid={lastName ? "false" : "true"}
+            aria-describedby="uidnote"
+            onFocus={() => setUserFocus(true)}
+            onBlur={() => setUserFocus(false)}
+          />
+          <p
+            id="uidnote"
+            className={
+              userFocus && user && !lastName ? "instructions" : "offscreen"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            1 to 24 characters.
+            <br />
+            Letters, numbers, underscores, hyphens allowed.
+          </p>
 
-            <label htmlFor="ssn">
-              SSN:
-              <FontAwesomeIcon
-                icon={faCheck}
-                className={validPwd ? "valid" : "hide"}
-              />
-              <FontAwesomeIcon
-                icon={faTimes}
-                className={validPwd || !pwd ? "hide" : "invalid"}
-              />
-            </label>
-            <input
-              type="numbers"
-              id="ssn"
-              onChange={(e) => setPwd(e.target.value)}
-              value={pwd}
-              required
-              aria-invalid={validPwd ? "false" : "true"}
-              aria-describedby="pwdnote"
-              onFocus={() => setPwdFocus(true)}
-              onBlur={() => setPwdFocus(false)}
+          <label htmlFor="ssn">
+            SSN:
+            <FontAwesomeIcon
+              icon={faCheck}
+              className={validPwd ? "valid" : "hide"}
             />
-            <p
-              id="pwdnote"
-              className={pwdFocus && !validPwd ? "instructions" : "offscreen"}
-            >
-              <FontAwesomeIcon icon={faInfoCircle} />
-              Format ###-##-####
-              <br />
-              Must include numbers separated with (-).
-            </p>
-            <button
-              disabled={!firstName || !lastName || !validPwd ? true : false}
-            >
-              Reset
-            </button>
-            <button
-              disabled={!firstName || !lastName || !validPwd ? true : false}
-            >
-              Save
-            </button>
-          </form>
-        </section>
-      )}
+            <FontAwesomeIcon
+              icon={faTimes}
+              className={validPwd || !pwd ? "hide" : "invalid"}
+            />
+          </label>
+          <input
+            type="numbers"
+            id="ssn"
+            onChange={(e) => setPwd(e.target.value)}
+            value={pwd}
+            required
+            aria-invalid={validPwd ? "false" : "true"}
+            aria-describedby="pwdnote"
+            onFocus={() => setPwdFocus(true)}
+            onBlur={() => setPwdFocus(false)}
+          />
+          <p
+            id="pwdnote"
+            className={pwdFocus && !validPwd ? "instructions" : "offscreen"}
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            Format ###-##-####
+            <br />
+            Must include numbers separated with (-).
+          </p>
+          <button
+            disabled={!firstName || !lastName || !validPwd ? true : false}
+          >
+            Reset
+          </button>
+          <button
+            disabled={!firstName || !lastName || !validPwd ? true : false}
+          >
+            Save
+          </button>
+        </form>
+      </section>
     </>
   );
 };
