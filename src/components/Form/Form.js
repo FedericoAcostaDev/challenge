@@ -270,7 +270,7 @@ const Form = () => {
           >
             <FontAwesomeIcon icon={faInfoCircle} />8 to 24 characters.
           </p>
-          <div>
+          <div className="buttons">
             <button
               disabled={firstName || lastName || address || ssn ? false : true}
             >
