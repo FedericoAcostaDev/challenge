@@ -18,11 +18,11 @@ axios.interceptors.request.use(
 //end axios config
 
 const List = (_) => {
-  const [name, setName] = useState([]);
+  const [members, setMembers] = useState("");
 
   useEffect(() => {
     axios.get(`http://localhost:8081/api/members`).then((res) => {
-      setName(res.data.name);
+      setMembers(res.data.name);
     });
   }, []);
 
@@ -38,11 +38,19 @@ const List = (_) => {
           </tr>
         </thead>
         <tbody>
+          {/* {members.map((member) => (
+            <tr>
+              <td>{member.firstName}</td>
+              <td>{member.lastName}</td>
+              <td>{member.address}</td>
+              <td>{member.ssn}</td>
+          </tr> 
+          ))}*/}
           <tr>
-            <td>jenny</td>
-            <td>huu</td>
-            <td>calle 123</td>
-            <td>123-45-6888</td>
+            <td>firstName</td>
+            <td>lastName</td>
+            <td>address</td>
+            <td>ssn</td>
           </tr>
         </tbody>
       </table>

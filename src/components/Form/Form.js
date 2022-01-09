@@ -31,50 +31,72 @@ const Form = () => {
   const userRef = useRef();
   const errRef = useRef();
 
-  const [user, setUser] = useState("");
-  const [firstName, setFirstName] = useState(false);
-  const [lastName, setLastName] = useState(false);
-  const [userFocus, setUserFocus] = useState(false);
+  //First Name
+  const [firstName, setFirstName] = useState("");
+  const [validFirstName, setValidFirstName] = useState(false);
+  const [firstNameFocus, setFirstNameFocus] = useState(false);
+
+  //Last Name
+  const [lastName, setLastName] = useState("");
+  const [validLastName, setValidLastName] = useState(false);
+  const [lastNameFocus, setLastNameFocus] = useState(false);
 
   const [pwd, setPwd] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
 
   const [errMsg, setErrMsg] = useState("");
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     userRef.current.focus();
   }, []);
 
+  //First Name
   useEffect(() => {
-    setFirstName(INFO_REGEX.test(user));
-  }, [user]);
+    setValidFirstName(INFO_REGEX.test(firstName));
+    setValidLastName(INFO_REGEX.test(lastName));
+  }, [firstName, lastName]);
 
   useEffect(() => {
-    setLastName(INFO_REGEX.test(user));
-  }, [user]);
-
-  useEffect(() => {
-    setValidPwd(SSN_REGEX.test(pwd));
-  }, [pwd]);
+    setErrMsg("");
+  }, [firstName, lastName, pwd]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // if button enabled with JS hack
-    const v1 = INFO_REGEX.test(user);
+    const v1 = INFO_REGEX.test(firstName);
     const v2 = SSN_REGEX.test(pwd);
     if (!v1 || !v2) {
       setErrMsg("Invalid Entry");
       return;
     }
-    //adeed to check server connection
-    console.log(user, pwd);
-
     try {
-      const result = await axios.post(`${apiUrl}/members`);
-      setUser(result.data);
-    } catch (error) {
-      console.log(error);
+      const response = await axios.post(
+        "http://localhost:8081/api/members",
+        JSON.stringify({ firstName, pwd }),
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        }
+      );
+      console.log(response?.data);
+      console.log(response?.accessToken);
+      console.log(JSON.stringify(response));
+      setSuccess(true);
+      //clear state and controlled inputs
+      //need value attrib on inputs for this
+      setFirstName("");
+      setPwd("");
+    } catch (err) {
+      if (!err?.response) {
+        setErrMsg("No Server Response");
+      } else if (err.response?.status === 409) {
+        setErrMsg("Username Taken");
+      } else {
+        setErrMsg("Registration Failed");
+      }
+      errRef.current.focus();
     }
   };
 
@@ -91,14 +113,14 @@ const Form = () => {
         <h1>Add Member</h1>
         <form onSubmit={handleSubmit}>
           <label htmlFor="firstname">
-            Firstname:
+            First Name:
             <FontAwesomeIcon
               icon={faCheck}
-              className={firstName ? "valid" : "hide"}
+              className={validFirstName ? "valid" : "hide"}
             />
             <FontAwesomeIcon
               icon={faTimes}
-              className={firstName || !user ? "hide" : "invalid"}
+              className={validFirstName || !firstName ? "hide" : "invalid"}
             />
           </label>
           <input
@@ -106,35 +128,41 @@ const Form = () => {
             id="firstname"
             ref={userRef}
             autoComplete="off"
-            onChange={(e) => setUser(e.target.value)}
-            value={user}
+            onChange={(e) => setFirstName(e.target.value)}
+            value={firstName}
             required
-            aria-invalid={firstName ? "false" : "true"}
+            aria-invalid={validFirstName ? "false" : "true"}
             aria-describedby="uidnote"
-            onFocus={() => setUserFocus(true)}
-            onBlur={() => setUserFocus(false)}
+            onFocus={() => setFirstNameFocus(true)}
+            onBlur={() => setFirstNameFocus(false)}
           />
           <p
             id="uidnote"
             className={
-              userFocus && user && !firstName ? "instructions" : "offscreen"
+              firstNameFocus && firstName && !validFirstName
+                ? "instructions"
+                : "offscreen"
             }
           >
             <FontAwesomeIcon icon={faInfoCircle} />
-            1 to 24 characters.
+            1 character minimum, up to 24 characters.
+            <br />
+            Must begin with a letter.
             <br />
             Letters, numbers, underscores, hyphens allowed.
           </p>
+        </form>
 
+        <form onSubmit={handleSubmit}>
           <label htmlFor="lastname">
-            Lastname:
+            Last Name:
             <FontAwesomeIcon
               icon={faCheck}
-              className={lastName ? "valid" : "hide"}
+              className={validLastName ? "valid" : "hide"}
             />
             <FontAwesomeIcon
               icon={faTimes}
-              className={lastName || !user ? "hide" : "invalid"}
+              className={validLastName || !lastName ? "hide" : "invalid"}
             />
           </label>
           <input
@@ -142,58 +170,26 @@ const Form = () => {
             id="lastname"
             ref={userRef}
             autoComplete="off"
-            onChange={(e) => setUser(e.target.value)}
-            value={user}
+            onChange={(e) => setLastName(e.target.value)}
+            value={lastName}
             required
-            aria-invalid={lastName ? "false" : "true"}
+            aria-invalid={validLastName ? "false" : "true"}
             aria-describedby="uidnote"
-            onFocus={() => setUserFocus(true)}
-            onBlur={() => setUserFocus(false)}
+            onFocus={() => setLastNameFocus(true)}
+            onBlur={() => setLastNameFocus(false)}
           />
           <p
             id="uidnote"
             className={
-              userFocus && user && !lastName ? "instructions" : "offscreen"
+              lastNameFocus && lastName && !validLastName
+                ? "instructions"
+                : "offscreen"
             }
           >
             <FontAwesomeIcon icon={faInfoCircle} />
-            1 to 24 characters.
+            1 character minimum, up to 24 characters.
             <br />
-            Letters, numbers, underscores, hyphens allowed.
-          </p>
-
-          <label htmlFor="adress">
-            Adress:
-            <FontAwesomeIcon
-              icon={faCheck}
-              className={lastName ? "valid" : "hide"}
-            />
-            <FontAwesomeIcon
-              icon={faTimes}
-              className={lastName || !user ? "hide" : "invalid"}
-            />
-          </label>
-          <input
-            type="text"
-            id="lastname"
-            ref={userRef}
-            autoComplete="off"
-            onChange={(e) => setUser(e.target.value)}
-            value={user}
-            required
-            aria-invalid={lastName ? "false" : "true"}
-            aria-describedby="uidnote"
-            onFocus={() => setUserFocus(true)}
-            onBlur={() => setUserFocus(false)}
-          />
-          <p
-            id="uidnote"
-            className={
-              userFocus && user && !lastName ? "instructions" : "offscreen"
-            }
-          >
-            <FontAwesomeIcon icon={faInfoCircle} />
-            1 to 24 characters.
+            Must begin with a letter.
             <br />
             Letters, numbers, underscores, hyphens allowed.
           </p>
@@ -224,21 +220,16 @@ const Form = () => {
             id="pwdnote"
             className={pwdFocus && !validPwd ? "instructions" : "offscreen"}
           >
-            <FontAwesomeIcon icon={faInfoCircle} />
-            Format ###-##-####
-            <br />
-            Must include numbers separated with (-).
+            <FontAwesomeIcon icon={faInfoCircle} />8 to 24 characters.
           </p>
-          <button
-            disabled={!firstName || !lastName || !validPwd ? true : false}
-          >
-            Reset
-          </button>
-          <button
-            disabled={!firstName || !lastName || !validPwd ? true : false}
-          >
-            Save
-          </button>
+          <div>
+            <button disabled={!validFirstName || !validPwd ? true : false}>
+              Reset
+            </button>
+            <button disabled={!validFirstName || !validPwd ? true : false}>
+              Save
+            </button>
+          </div>
         </form>
       </section>
     </>
