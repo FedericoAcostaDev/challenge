@@ -7,7 +7,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./Form.css";
 const INFO_REGEX = /^[A-z][A-z0-9-_]{1,23}$/;
-const SSN_REGEX = /^[A-z][A-z0-9-_]{1,23}$/;
+const SSN_REGEX = /(\d{3}-)(\d{2}-)(\d{4})/;
 
 const Form = () => {
   const userRef = useRef();
