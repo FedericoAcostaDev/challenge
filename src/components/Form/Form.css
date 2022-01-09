@@ -35,7 +35,10 @@ label,
 button {
   margin-top: 1rem;
 }
-
+.buttons {
+  display: flex;
+  justify-content: space-between;
+}
 button {
   padding: 0.5rem;
 }
