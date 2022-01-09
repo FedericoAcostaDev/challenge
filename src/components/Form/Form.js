@@ -98,7 +98,7 @@ const Form = () => {
           >
             {errMsg}
           </p>
-          <h1>Register</h1>
+          <h1>Add Member</h1>
           <form>
             <label htmlFor="firstname">
               Firstname:
@@ -220,7 +220,7 @@ const Form = () => {
               />
             </label>
             <input
-              type="ssn"
+              type="numbers"
               id="ssn"
               onChange={(e) => setPwd(e.target.value)}
               value={pwd}
@@ -235,19 +235,15 @@ const Form = () => {
               className={pwdFocus && !validPwd ? "instructions" : "offscreen"}
             >
               <FontAwesomeIcon icon={faInfoCircle} />
-              8 to 24 characters.
+              Format ###-##-####
               <br />
-              Must include uppercase and lowercase letters, a number and a
-              special character.
-              <br />
-              Allowed special characters:{" "}
-              <span aria-label="exclamation mark">!</span>{" "}
-              <span aria-label="at symbol">@</span>{" "}
-              <span aria-label="hashtag">#</span>{" "}
-              <span aria-label="dollar sign">$</span>{" "}
-              <span aria-label="percent">%</span>
+              Must include numbers separated with (-).
             </p>
-
+            <button
+              disabled={!firstName || !lastName || !validPwd ? true : false}
+            >
+              Reset
+            </button>
             <button
               disabled={!firstName || !lastName || !validPwd ? true : false}
             >
