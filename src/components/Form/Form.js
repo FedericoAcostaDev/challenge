@@ -6,9 +6,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./Form.css";
-const INFO_REGEX = /^[A-z][A-z0-9-_]{1,23}$/;
-const SSN_REGEX = /(\d{3}-)(\d{2}-)(\d{4})/;
+import axios from "../../api/axios";
 
+const INFO_REGEX = /^[A-z][A-z0-9-_]{1,23}$/;
+const SSN_REGEX = /^\d{3}-\d{2}-\d{4}$/;
+const API_URL = "http://localhost:8081/api/members";
 const Form = () => {
   const userRef = useRef();
   const errRef = useRef();
@@ -55,7 +57,7 @@ const Form = () => {
     //added
     try {
       const response = await axios.post(
-        REGISTER_URL,
+        API_URL,
         JSON.stringify({ user, pwd }),
         {
           headers: { "Content-Type": "application/json" },
@@ -69,14 +71,13 @@ const Form = () => {
       //need value attrib on inputs for this
       setUser("");
       setPwd("");
-      setMatchPwd("");
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
       } else if (err.response?.status === 409) {
-        setErrMsg("Username Taken");
+        setErrMsg("SSN already Taken");
       } else {
-        setErrMsg("Registration Failed");
+        setErrMsg("Submission Failed");
       }
       errRef.current.focus();
     }
