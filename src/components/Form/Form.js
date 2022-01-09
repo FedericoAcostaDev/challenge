@@ -41,9 +41,14 @@ const Form = () => {
   const [validLastName, setValidLastName] = useState(false);
   const [lastNameFocus, setLastNameFocus] = useState(false);
 
-  const [pwd, setPwd] = useState("");
-  const [validPwd, setValidPwd] = useState(false);
-  const [pwdFocus, setPwdFocus] = useState(false);
+  //Address
+  const [address, setAddress] = useState("");
+  const [validAddress, setValidAddress] = useState(false);
+  const [addressFocus, setAddressFocus] = useState(false);
+
+  const [ssn, setSsn] = useState("");
+  const [validSsn, setValidSsn] = useState(false);
+  const [ssnFocus, setSsnFocus] = useState(false);
 
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
@@ -52,21 +57,22 @@ const Form = () => {
     userRef.current.focus();
   }, []);
 
-  //First Name
   useEffect(() => {
     setValidFirstName(INFO_REGEX.test(firstName));
     setValidLastName(INFO_REGEX.test(lastName));
-  }, [firstName, lastName]);
+    setValidAddress(INFO_REGEX.test(address));
+    setValidSsn(SSN_REGEX.test(ssn));
+  }, [firstName, lastName, address, ssn]);
 
   useEffect(() => {
     setErrMsg("");
-  }, [firstName, lastName, pwd]);
+  }, [firstName, lastName, ssn]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     // if button enabled with JS hack
     const v1 = INFO_REGEX.test(firstName);
-    const v2 = SSN_REGEX.test(pwd);
+    const v2 = SSN_REGEX.test(ssn);
     if (!v1 || !v2) {
       setErrMsg("Invalid Entry");
       return;
@@ -74,7 +80,7 @@ const Form = () => {
     try {
       const response = await axios.post(
         "http://localhost:8081/api/members",
-        JSON.stringify({ firstName, pwd }),
+        JSON.stringify({ firstName, ssn }),
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
@@ -87,7 +93,7 @@ const Form = () => {
       //clear state and controlled inputs
       //need value attrib on inputs for this
       setFirstName("");
-      setPwd("");
+      setSsn("");
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -193,40 +199,90 @@ const Form = () => {
             <br />
             Letters, numbers, underscores, hyphens allowed.
           </p>
+        </form>
+
+        <form onSubmit={handleSubmit}>
+          <label htmlFor="address">
+            Address:
+            <FontAwesomeIcon
+              icon={faCheck}
+              className={validAddress ? "valid" : "hide"}
+            />
+            <FontAwesomeIcon
+              icon={faTimes}
+              className={validAddress || !address ? "hide" : "invalid"}
+            />
+          </label>
+          <input
+            type="text"
+            id="address"
+            ref={userRef}
+            autoComplete="off"
+            onChange={(e) => setAddress(e.target.value)}
+            value={address}
+            required
+            aria-invalid={validAddress ? "false" : "true"}
+            aria-describedby="uidnote"
+            onFocus={() => setAddressFocus(true)}
+            onBlur={() => setAddressFocus(false)}
+          />
+          <p
+            id="uidnote"
+            className={
+              addressFocus && address && !validAddress
+                ? "instructions"
+                : "offscreen"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            1 character minimum, up to 24 characters.
+            <br />
+            Must begin with a letter.
+            <br />
+            Letters, numbers, underscores, hyphens allowed.
+          </p>
 
           <label htmlFor="ssn">
             SSN:
             <FontAwesomeIcon
               icon={faCheck}
-              className={validPwd ? "valid" : "hide"}
+              className={validSsn ? "valid" : "hide"}
             />
             <FontAwesomeIcon
               icon={faTimes}
-              className={validPwd || !pwd ? "hide" : "invalid"}
+              className={validSsn || !ssn ? "hide" : "invalid"}
             />
           </label>
           <input
             type="numbers"
             id="ssn"
-            onChange={(e) => setPwd(e.target.value)}
-            value={pwd}
+            onChange={(e) => setSsn(e.target.value)}
+            value={ssn}
             required
-            aria-invalid={validPwd ? "false" : "true"}
-            aria-describedby="pwdnote"
-            onFocus={() => setPwdFocus(true)}
-            onBlur={() => setPwdFocus(false)}
+            aria-invalid={validSsn ? "false" : "true"}
+            aria-describedby="ssnnote"
+            onFocus={() => setSsnFocus(true)}
+            onBlur={() => setSsnFocus(false)}
           />
           <p
-            id="pwdnote"
-            className={pwdFocus && !validPwd ? "instructions" : "offscreen"}
+            id="ssnnote"
+            className={ssnFocus && !validSsn ? "instructions" : "offscreen"}
           >
             <FontAwesomeIcon icon={faInfoCircle} />8 to 24 characters.
           </p>
           <div>
-            <button disabled={!validFirstName || !validPwd ? true : false}>
+            <button
+              disabled={firstName || lastName || address || ssn ? false : true}
+            >
               Reset
             </button>
-            <button disabled={!validFirstName || !validPwd ? true : false}>
+            <button
+              disabled={
+                !validFirstName || !validLastName || !validAddress || !validSsn
+                  ? true
+                  : false
+              }
+            >
               Save
             </button>
           </div>
