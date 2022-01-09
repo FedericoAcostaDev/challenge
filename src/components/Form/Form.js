@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import axios from "axios";
 import {
   faCheck,
   faTimes,
@@ -6,11 +7,26 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "./Form.css";
-import axios from "../../api/axios";
 
 const INFO_REGEX = /^[A-z][A-z0-9-_]{1,23}$/;
 const SSN_REGEX = /^\d{3}-\d{2}-\d{4}$/;
-const API_URL = "http://localhost:8081/api/members";
+
+//axios config
+const accesToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsIm5hbWUiOiJzYXJhaCIsImFkbWluIjpmYWxzZSwiaWF0IjoxNjQxNzA0OTUyLCJleHAiOjE2NDE3MDU4NTJ9.tLX30NP8gpu8oxZxeBsohJRFO14yLDG7VA23EUHilCA";
+const apiUrl = "http://localhost:8081/api";
+
+axios.interceptors.request.use(
+  (config) => {
+    config.headers.authorization = `Bearer ${accesToken}`;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+//end axios config
+
 const Form = () => {
   const userRef = useRef();
   const errRef = useRef();
@@ -54,32 +70,11 @@ const Form = () => {
     //adeed to check server connection
     console.log(user, pwd);
 
-    //added
     try {
-      const response = await axios.post(
-        API_URL,
-        JSON.stringify({ user, pwd }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      console.log(response?.data);
-      console.log(response?.accessToken);
-      console.log(JSON.stringify(response));
-      //clear state and controlled inputs
-      //need value attrib on inputs for this
-      setUser("");
-      setPwd("");
-    } catch (err) {
-      if (!err?.response) {
-        setErrMsg("No Server Response");
-      } else if (err.response?.status === 409) {
-        setErrMsg("SSN already Taken");
-      } else {
-        setErrMsg("Submission Failed");
-      }
-      errRef.current.focus();
+      const result = await axios.post(`${apiUrl}/members`);
+      setUser(result.data);
+    } catch (error) {
+      console.log(error);
     }
   };
 
