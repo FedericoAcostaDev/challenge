@@ -2,5 +2,19 @@
   background-color: rgb(141, 141, 141);
   line-height: 3;
   text-align: center;
-  margin-top: auto;
+  justify-content: center;
+  margin-top: 0vh;
+}
+
+.footerContainer {
+  background-color: rgb(141, 141, 141);
+  line-height: 6;
+  text-align: center;
+  justify-content: center;
+  justify-content: space-between;
+  display: flex;
+}
+h5 {
+  margin-left: 50px;
+  margin-right: 50px;
 }

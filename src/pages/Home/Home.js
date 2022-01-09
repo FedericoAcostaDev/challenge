@@ -4,9 +4,9 @@ import List from "../../components/List/List";
 import "./Home.css";
 const Home = () => {
   return (
-    <div className="container">
+    <div className="bodyContainer">
       <Form />
-      <List />
+      <List className="list" />
     </div>
   );
 };
