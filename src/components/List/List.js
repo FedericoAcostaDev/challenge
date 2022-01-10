@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import "./List.css";
 
 //axios config
 const accesToken =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsIm5hbWUiOiJzYXJhaCIsImFkbWluIjpmYWxzZSwiaWF0IjoxNjQxNzA2ODc2LCJleHAiOjE2NDE3MDc3NzZ9.PLL_nePawrvmlmDTPw4TnJLtMekbvCKq35ZOGwYAmj8";
 
-axios.interceptors.request.use(
+api.interceptors.request.use(
   (config) => {
     config.headers.authorization = `Bearer ${accesToken}`;
     return config;
@@ -21,7 +21,7 @@ const List = (_) => {
   const [members, setMembers] = useState("");
 
   useEffect(() => {
-    axios.get(`http://localhost:8081/api/members`).then((res) => {
+    api.get(`http://localhost:8081/api/members`).then((res) => {
       setMembers(res.data.name);
     });
   }, []);

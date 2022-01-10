@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import axios from "axios";
+import api from "../../api/axios";
 import {
   faCheck,
   faTimes,
@@ -12,24 +12,14 @@ const INFO_REGEX = /^[A-z][A-z0-9-_]{1,23}$/;
 const SSN_REGEX = /^\d{3}-\d{2}-\d{4}$/;
 
 //axios config
-const accesToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsIm5hbWUiOiJzYXJhaCIsImFkbWluIjpmYWxzZSwiaWF0IjoxNjQxNzA0OTUyLCJleHAiOjE2NDE3MDU4NTJ9.tLX30NP8gpu8oxZxeBsohJRFO14yLDG7VA23EUHilCA";
-const apiUrl = "http://localhost:8081/api";
 
-axios.interceptors.request.use(
-  (config) => {
-    config.headers.authorization = `Bearer ${accesToken}`;
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 //end axios config
 
 const Form = () => {
   const userRef = useRef();
   const errRef = useRef();
+
+  //form handlers
 
   //First Name
   const [firstName, setFirstName] = useState("");
@@ -42,6 +32,7 @@ const Form = () => {
   const [lastNameFocus, setLastNameFocus] = useState(false);
 
   //Address
+  const [body, setBody] = useState({});
   const [address, setAddress] = useState("");
   const [validAddress, setValidAddress] = useState(false);
   const [addressFocus, setAddressFocus] = useState(false);
@@ -66,44 +57,17 @@ const Form = () => {
 
   useEffect(() => {
     setErrMsg("");
-  }, [firstName, lastName, ssn]);
+  }, [firstName, lastName, address, ssn]);
 
+  //trying axios
+  const handleChange = (e) => {
+    setBody({ ...body, [e.target.name]: e.target.value });
+    console.log(body);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // if button enabled with JS hack
-    const v1 = INFO_REGEX.test(firstName);
-    const v2 = SSN_REGEX.test(ssn);
-    if (!v1 || !v2) {
-      setErrMsg("Invalid Entry");
-      return;
-    }
-    try {
-      const response = await axios.post(
-        "http://localhost:8081/api/members",
-        JSON.stringify({ firstName, ssn }),
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      console.log(response?.data);
-      console.log(response?.accessToken);
-      console.log(JSON.stringify(response));
-      setSuccess(true);
-      //clear state and controlled inputs
-      //need value attrib on inputs for this
-      setFirstName("");
-      setSsn("");
-    } catch (err) {
-      if (!err?.response) {
-        setErrMsg("No Server Response");
-      } else if (err.response?.status === 409) {
-        setErrMsg("Username Taken");
-      } else {
-        setErrMsg("Registration Failed");
-      }
-      errRef.current.focus();
-    }
+    console.log(firstName, lastName, address, ssn);
+    api.post("/", { body }).then((data) => console.log(data.data));
   };
 
   return (
@@ -117,7 +81,7 @@ const Form = () => {
           {errMsg}
         </p>
         <h1>Add Member</h1>
-        <form onSubmit={handleSubmit}>
+        <form action="" onChange={handleChange} onSubmit={handleSubmit}>
           <label htmlFor="firstname">
             First Name:
             <FontAwesomeIcon
@@ -131,6 +95,7 @@ const Form = () => {
           </label>
           <input
             type="text"
+            name="firstName"
             id="firstname"
             ref={userRef}
             autoComplete="off"
@@ -157,9 +122,7 @@ const Form = () => {
             <br />
             Letters, numbers, underscores, hyphens allowed.
           </p>
-        </form>
 
-        <form onSubmit={handleSubmit}>
           <label htmlFor="lastname">
             Last Name:
             <FontAwesomeIcon
@@ -174,6 +137,7 @@ const Form = () => {
           <input
             type="text"
             id="lastname"
+            name="lastName"
             ref={userRef}
             autoComplete="off"
             onChange={(e) => setLastName(e.target.value)}
@@ -199,9 +163,7 @@ const Form = () => {
             <br />
             Letters, numbers, underscores, hyphens allowed.
           </p>
-        </form>
 
-        <form onSubmit={handleSubmit}>
           <label htmlFor="address">
             Address:
             <FontAwesomeIcon
@@ -216,6 +178,7 @@ const Form = () => {
           <input
             type="text"
             id="address"
+            name="address"
             ref={userRef}
             autoComplete="off"
             onChange={(e) => setAddress(e.target.value)}
@@ -256,6 +219,7 @@ const Form = () => {
           <input
             type="numbers"
             id="ssn"
+            name="ssn"
             onChange={(e) => setSsn(e.target.value)}
             value={ssn}
             required

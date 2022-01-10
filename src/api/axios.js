@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosConn = axios.create({
-  baseURL: `https://localhost:8081`,
+  baseURL: `https://localhost:8081/api/members`,
 });
 
 export default axiosConn;
@@ -11,11 +11,11 @@ axiosConn.interceptors.request.use(
   function (config) {
     console.log("Interceptor Request (Outgoing) ", config);
 
-    config.headers.API_KEY =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsIm5hbWUiOiJzYXJhaCIsImFkbWluIjpmYWxzZSwiaWF0IjoxNjQxNzI3NzE5LCJleHAiOjE2NDE3Mjg2MTl9.Ouade6TiSzLQRy4GVI65z62TtE-OlxErXWe_283zQ0M";
+    config.headers.Authorization =
+      "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsIm5hbWUiOiJzYXJhaCIsImFkbWluIjpmYWxzZSwiaWF0IjoxNjQxNzY4OTY0LCJleHAiOjE2NDE3Njk4NjR9.F1QCPARqAqqYf8u7lKiltj0_G8w9ZFHy0mox9LIY9rU";
 
     if (sessionStorage.getItem("jwt_token")) {
-      config.headers.Authorization = `Bearer ${sessionStorage.getItem(
+      config.headers.Authorization = `bearer ${sessionStorage.getItem(
         "jwt_token"
       )}`;
     }
